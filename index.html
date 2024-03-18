@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Add a Book</h1>
+
+    <form id="bookForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br>
+    
+        <label for="ProductCode">Product Code:</label>
+        <input type="text" id="ProductCode" name="ProductCode" required><br>
+    
+        <label for="ProductDate">Product Date:</label>
+        <input type="text" id="ProductDate" name="ProductDate" required><br>
+    
+        <label for="ProductName">Product Name:</label>
+        <input type="text" id="ProductName" name="ProductName" required><br>
+    
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" required><br>
+    
+        <label for="ProductStoreCode">Product Store Code:</label>
+        <input type="text" id="ProductStoreCode" name="ProductStoreCode" required><br>
+    
+        <button type="button" onclick="addBook()">Add Book</button>
+    </form>
+    
+
+    <script>
+        async function addBook() {
+            const title = document.getElementById('title').value;
+    const ProductCode = document.getElementById('ProductCode').value;
+    const ProductDate = document.getElementById('ProductDate').value;
+    const ProductName = document.getElementById('ProductName').value;
+    const price = parseFloat(document.getElementById('price').value); 
+    const ProductStoreCode = document.getElementById('ProductStoreCode').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/books', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title,
+                        ProductCode,
+                        ProductDate,
+                        ProductName,
+                        price,
+                        ProductStoreCode
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Book added successfully:', data.book);
+                    window.location.href = 'http://127.0.0.1:8081/GetallBook';
+                } else {
+                    console.error('Error adding book:', data.error);
+                }
+            } catch (error) {
+                console.error('Error adding book:', error);
+            }
+        }
+
+    </script>
+
+</body>
+</html>

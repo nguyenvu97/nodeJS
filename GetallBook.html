@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        strong {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Add some spacing between list items */
+        li:not(:last-child) {
+            margin-bottom: 16px;
+        }
+
+        /* Style for delete and update buttons */
+        .action-buttons button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book List</h1>
+    <ul id="bookList"></ul>
+    
+        <h2>Update Book Information</h2>
+        <input type="hidden" id="updateBookId">
+        <label for="updateTitle">Title:</label>
+        <input type="text" id="updateTitle"><br>
+        <label for="updatePrice">Price:</label>
+        <input type="text" id="updatePrice"><br>
+        <label for="updateProductCode">Product Code:</label>
+        <input type="text" id="updateProductCode"><br>
+        <label for="updateProductDate">Product Date:</label>
+        <input type="text" id="updateProductDate"><br>
+        <label for="updateProductName">Product Name:</label>
+        <input type="text" id="updateProductName"><br>
+        <label for="updateProductStoreCode">Product Store Code:</label>
+        <input type="text" id="updateProductStoreCode"><br>
+        <button onclick="saveUpdatedBook()">Save</button>
+    
+</body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Gọi API để lấy danh sách sách
+            fetch('http://localhost:3000/api/GetallBook', { method: "GET" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const bookList = document.getElementById('bookList');
+                        data.book.forEach(book => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                            <div>
+                 <strong>Title:</strong> ${book.title}, <br>
+    <strong>Price:</strong> ${book.price}, <br>
+    <strong>ID:</strong> ${book.id}, <br>
+    <strong>Product Code:</strong> ${book.ProductCode}, <br>
+    <strong>Product Date:</strong> ${book.ProductDate}, <br>
+    <strong>Product Name:</strong> ${book.ProductName}, <br>
+    <strong>Product Store Code:</strong> ${book.ProductStoreCode}
+</div>          
+
+                                <div class="action-buttons">
+                                    <button onclick="deleteBook(${book.id})">Delete</button>
+                                    <button onclick="showUpdateBookForm(${book.id})">Update</button>
+                                </div>`;
+                            bookList.appendChild(listItem);
+                        
+                        });
+                    } else {
+                        console.error('Error fetching book list:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching book list:', error);
+                });
+        });
+        
+        function deleteBook(bookId) {
+            // Gọi API để xóa sách
+            fetch(`http://localhost:3000/api/deleteBook/${bookId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Cập nhật lại danh sách sau khi xóa
+                        location.reload(); // Refresh the page to update the book list
+                    } else {
+                        console.error('Error deleting book:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting book:', error);
+                });
+        }
+        function showUpdateBookForm(bookId) {
+    fetch(`http://localhost:3000/api/updateBook/${bookId}`, { method: "PUT" })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const book = data.book;
+                document.getElementById('updateBookId').value = book.id;
+                document.getElementById('updateTitle').value = book.title;
+                document.getElementById('updatePrice').value = book.price;
+                document.getElementById('updateProductCode').value = book.ProductCode;
+                document.getElementById('updateProductDate').value = book.ProductDate;
+                document.getElementById('updateProductName').value = book.ProductName;
+                document.getElementById('updateProductStoreCode').value = book.ProductStoreCode;
+                document.getElementById('updateBookSection').style.display = 'block';
+            } else {
+                console.error('Error getting book information:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error getting book information:', error);
+        });
+}
+    </script>
+
